@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkSense — URL Security Analyzer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="shell">
+
+        <!-- ── Sidebar ── -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="brand">
+                    <span class="brand-mark">LS</span>
+                    <div class="brand-text">
+                        <strong>LinkSense</strong>
+                        <small>URL Security</small>
+                    </div>
+                </div>
+
+                <nav class="nav">
+                    <button class="nav-link active" data-tab="single">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        URL Scanner
+                    </button>
+                    <button class="nav-link" data-tab="qr">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/></svg>
+                        QR Scanner
+                    </button>
+                    <button class="nav-link" data-tab="batch">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                        Batch Analysis
+                    </button>
+                    <button class="nav-link" data-tab="info">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                        Model Info
+                    </button>
+                </nav>
+            </div>
+
+            <div class="sidebar-bottom">
+                <div class="status-pill">
+                    <span class="pulse-dot"></span> Live
+                </div>
+            </div>
+        </aside>
+
+        <!-- ── Main ── -->
+        <div class="main">
+
+            <!-- Single URL Tab -->
+            <div class="tab-content active" id="single-tab">
+                <div class="page-head">
+                    <h1>URL Scanner</h1>
+                    <p>Check any link for phishing, malware, or suspicious patterns.</p>
+                </div>
+
+                <div class="scan-box">
+                    <div class="scan-row">
+                        <input type="text" id="url-input" placeholder="paste a URL here…" autocomplete="off" spellcheck="false">
+                        <button id="analyze-btn" class="btn-scan">
+                            Scan
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                    <span class="scan-hint">Press Enter or click Scan — supports http, https, bare domains</span>
+                </div>
+
+                <div id="loading" class="loading hidden">
+                    <div class="loader-track"><div class="loader-bar"></div></div>
+                    <span>Running analysis…</span>
+                </div>
+
+                <div id="result" class="result hidden"></div>
+            </div>
+
+            <!-- QR Scanner Tab -->
+            <div class="tab-content" id="qr-tab">
+                <div class="page-head">
+                    <h1>QR Scanner</h1>
+                    <p>Upload a QR code image to extract and scan the embedded URL.</p>
+                </div>
+
+                <div class="qr-upload-section">
+                <div class="drop-area" id="qr-drop-zone">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <p>Drop QR image here or <span class="link-text">browse</span></p>
+                    <small>PNG · JPG · JPEG</small>
+                    <input type="file" id="qr-file-input" accept=".png,.jpg,.jpeg" style="display:none">
+                </div>
+
+                <div id="qr-preview-container" class="qr-preview-container hidden">
+                    <img id="qr-preview-img" class="qr-preview-img" alt="" src="">
+                    <button id="qr-clear-btn" class="qr-clear-btn" title="Remove">✕</button>
+                </div>
+
+                <button id="qr-scan-btn" class="btn-scan" style="margin-top:16px;display:flex;" disabled>
+                    Scan QR
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+                </div>
+
+                <div id="qr-loading" class="loading hidden">
+                    <div class="loader-track"><div class="loader-bar"></div></div>
+                    <span id="qr-loading-text">Scanning…</span>
+                </div>
+
+                <div id="qr-result" class="hidden"></div>
+                <div id="qr-analysis-result" class="result hidden"></div>
+            </div>
+
+            <!-- Batch Tab -->
+            <div class="tab-content" id="batch-tab">
+                <div class="page-head">
+                    <h1>Batch Analysis</h1>
+                    <p>Paste multiple URLs, one per line, and scan them all at once.</p>
+                </div>
+
+                <textarea id="batch-input" rows="9" placeholder="https://example1.com&#10;https://example2.com&#10;https://example3.com"></textarea>
+                <button id="batch-analyze-btn" class="btn-scan" style="margin-top:14px;">
+                    Analyze All
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+
+                <div id="batch-loading" class="loading hidden">
+                    <div class="loader-track"><div class="loader-bar"></div></div>
+                    <span>Processing…</span>
+                </div>
+
+                <div id="batch-result" class="result hidden"></div>
+            </div>
+
+            <!-- Model Info Tab -->
+            <div class="tab-content" id="info-tab">
+                <div class="page-head">
+                    <h1>Model Info</h1>
+                    <p>Details about the underlying ML classifier.</p>
+                </div>
+
+                <div class="model-info">
+                    <div id="model-details">
+                        <div class="info-card">
+                            <h3>How It Works</h3>
+                            <p>This analyzer uses a <strong>RandomForest Machine Learning model</strong> trained to detect suspicious and phishing URLs.</p>
+                            <p style="margin-top:10px;">It analyzes <strong>21 different features</strong> of each URL including:</p>
+                            <ul>
+                                <li>URL length and structure</li>
+                                <li>HTTPS encryption presence</li>
+                                <li>IP address detection</li>
+                                <li>Suspicious keywords (login, verify, update, etc.)</li>
+                                <li>Special character patterns</li>
+                                <li>Domain and subdomain analysis</li>
+                                <li>And many more indicators…</li>
+                            </ul>
+                        </div>
+                        <div id="model-stats" class="info-card">
+                            <h3>Model Statistics</h3>
+                            <p>Loading model information…</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /main -->
+    </div><!-- /shell -->
+
+    <!-- Hidden tab-btns keep the original script.js tab logic intact -->
+    <div style="display:none" aria-hidden="true">
+        <button class="tab-btn active" data-tab="single"></button>
+        <button class="tab-btn" data-tab="qr"></button>
+        <button class="tab-btn" data-tab="batch"></button>
+        <button class="tab-btn" data-tab="info"></button>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Wire sidebar nav — syncs hidden .tab-btn so script.js stays intact
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                // Delegate to the hidden tab-btn so script.js handles everything
+                const target = document.querySelector('.tab-btn[data-tab="' + link.dataset.tab + '"]');
+                if (target) target.click();
+            });
+        });
+    </script>
+</body>
+</html>
